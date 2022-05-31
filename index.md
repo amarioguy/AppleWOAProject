@@ -1,12 +1,10 @@
-## Welcome to GitHub Pages
+## Welcome to the M1 Windows project
 
-You can use the [editor on GitHub](https://github.com/amarioguy/m1windowsproject/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Keeping things simple, the goal is to hopefully run Windows on Apple's M1 chip (and hopefully future Apple silicon chips too!)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Why a whole project for this?
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Contrary to how it may appear on the surface, Apple's chips are architecturally very different from standard ARM64 chips from companies like Qualcomm or MediaTek and a lot of hardware enablement needs to be done as a result.
 
 ```markdown
 Syntax highlighted code block

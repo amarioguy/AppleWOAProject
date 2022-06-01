@@ -31,9 +31,9 @@ Question: Does Windows have a way of supporting non-standard interrupt controlle
 
 3) Patching the Windows kernel directly to enable AIC support. The messiest solution, however it should be mentioned regardless. This solution would break Windows update so I'd prefer to avoid this if at all possible.
 
-### Progress
+### Progress (current as of 5/31/2022)
 
-Initial start has been fairly slow however I can confirm that the UEFI for the M1 will be using Project Mu (a Microsoft spinoff of EDK2) as the basis. The next step is getting Project Mu running on the M1
+Initial start has been fairly slow however I can confirm that the UEFI for the M1 will be using Project Mu (a Microsoft spinoff of EDK2) as the basis. The initial git repository is ready (I'll be pushing the code to my GitHub soon enough, though I'm still figuring out if I want to do continuous integration) and very soon I'll start iteration testing on the M1.
 
 ### Credits
 

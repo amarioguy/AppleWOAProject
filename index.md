@@ -9,31 +9,58 @@ Contrary to how it may appear on the surface, Apple's chips are architecturally 
 (An example: The Asahi Linux folks can't use PSCI, the ARM standard for core bringup, for starting the other ARM cores since they plan to run Linux in EL2 and Apple does not implement EL3. Windows requires PSCI, and this combined with other circumstances means I'll need to get PSCI working on the Apple cores.)
 
 
+### When will the project be done?
+
+Whenever it's done.
+
+This is not going to be a trivial project to finish, there's a lot of Apple specific oddities I must account for and things I need to do to ensure the M1 is able to boot Windows in a stable way. I'll need time to make sure everything works properly so there's no ETA on anything thus far.
+
+
+### Disclaimer
+
+This project is not guaranteed to be successful. I'll do my best to ensure it goes to completion but ultimately, there is zero guarantee that I will be able to get Windows working in a great way by the end of it all. But I'm going to try my absolute hardest. 
+
+
 ### What makes Windows on M1 hard?
 
 The short answer: the interrupt controller and the IOMMU.
 
-The detailed answer: Apple implements a non-standard interrupt controller on their SoCs, called the Apple Interrupt Controller (henceforth referred to as AIC). The ARM64 Windows kernel predictably does not implement support for the AIC (the overwhelming majority of ARM64 systems that run Windows use an interrupt controller standard called the Generic Interrupt Controller). Needless to say this is going to be the first major roadblock to getting Windows running since interrupts are fairly fundamental. RIght now there are three solutions I'm considering to solve the AIC problem (given the user controllable bootchain, all are plausible.)
+The detailed answer: Apple implements a non-standard interrupt controller on their SoCs, called the Apple Interrupt Controller (henceforth referred to as AIC). The ARM64 Windows kernel predictably does not implement support for the AIC (the overwhelming majority of ARM64 systems that run Windows use an interrupt controller standard called the Generic Interrupt Controller). Needless to say this is going to be the first major roadblock to getting Windows running since interrupts are fundamental to any multitasking OS.
 
 However, there's a second problem too. While the Apple MMU supports both 16K and 4K pages, the IOMMU only supports 16K pages as far as we know, which presents challenges with hardware communicating with Windows, and this is something I also need to have working.
 
 There is of course the consideration of essentially all the Apple specific hardware however most of this can be solved with drivers or with ACPI.
 
-### Possible solutions to AIC issue
+### Current game plan to deal with the interrupt controller issue
 
-Question: Does Windows have a way of supporting non-standard interrupt controllers? If so can this be extended?
+There's an somewhat obscure feature on M1 (and M1 Pro/Max/Ultra, henceforth referred to as M1 v2) chips where part of the GICv3 can be virtualized to guest OSes to enable faster interrupt handling. This does imply the use of a lightweight hypervisor in EL2 to handle the physical interrupts and routing them to Windows which is running in EL1, which does mean we need to give up Hyper-V support since neither M1 nor M1 v2 support nested virtualization. However this is not a huge loss in the grand scheme of things since the main point of the project is to get Windows running as close to the bare metal as feasible.
 
-### Current potential solutions
+Thankfully, there's already a very lightweight, open-source hypervisor for Apple silicon platforms that works great. Meet m1n1, the bootloader the Asahi folks are using to bootstrap UBoot on their implementation. The bootloader also serves as a very lightweight hypervisor that I can tweak such that it can be used for launching our UEFI firmware in EL1 and getting Windows running. (Right now work is being done in a custom fork of m1n1, I will push these changes to mainline m1n1 once I've verified that UEFI boots successfully)
 
-1) Emulating a GIC fully in EL2. This would be the most obvious solution, however due to interrupt handling having to go through hypervisor code, there will be a performance penalty, the extent of which is not fully understood yet.
+However, that's not the full story. This vGIC implementation has two oddities about it. The first is that it doesn't support hardware interrupt deactivation and it doesn't support the maintenance interrupt. This is simple enough to work around, since KVM encountered the same problem when using the vGIC in Linux it shouldn't be too hard to use their fix or a variation of their fix to work around this issue. The second is more pertinent, and that is when a guest OS writes invalid data to the vGIC registers, occasionally it'll fire an SError exception on the host which needless to say is *very bad*. Thankfully, since m1n1 is open source, I should be able to update the SError exception handler to handle this hardware bug. There is also some things to emulate but there won't be nearly as much performance penalty as if I had to emulate it fully.
 
-2) Writing a HAL extension. This would arguably be the best solution since if the HAL extension allows us to add native AIC support along with handling the 16k IOMMU pages, the only issue left would be the drivers and application compatibility testing. However, I'm still not fully sure if this is a viable path since the extent of how much HAL Extensions permit non-standard hardware is something I still need to answer.
+Once this is complete, UEFI and Windows should be able to notice the vGIC and use it as if it were a physical GIC and they should see little issue with it (though they will probably see issue with the myriad of Apple specific hardware)
 
-3) Patching the Windows kernel directly to enable AIC support. The messiest solution, however it should be mentioned regardless. This solution would break Windows update so I'd prefer to avoid this if at all possible.
+### Why not HAL Extensions to provide native AIC support?
 
-### Progress (current as of 5/31/2022)
+Simply put, HAL Extensions do not provide enough functionality to make this possible. They're too limited in what they can do and in what they're allowed to use. If a future Windows version allows foreign interrupt controllers through HAL Extensions, I will revisit using HAL Extensions.
 
-Initial start has been fairly slow however I can confirm that the UEFI for the M1 will be using Project Mu (a Microsoft spinoff of EDK2) as the basis. The initial git repository is ready (I'll be pushing the code to my GitHub soon enough, though I'm still figuring out if I want to do continuous integration) and very soon I'll start iteration testing on the M1.
+### Progress (current as of 6/4/2022)
+
+I'm working on getting m1n1 and it's hypervisor updated to handle booting UEFI and Windows better, including setting up the vGIC in EL1. Concurrently also working on getting Project Mu compiled for M1 platforms.
+
+### Tentative checklist of things still to be done/drivers to be made
+
+- hypervisor/GIC/UEFI bringup
+- Windows early boot
+- ANS2
+- IOMMUs
+- power management
+- display output (relevant to desktops only)
+- Thunderbolt
+- Ethernet
+- Wireless
+- GPU/DCP
 
 ### Credits
 

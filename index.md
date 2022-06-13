@@ -8,6 +8,9 @@ Contrary to how it may appear on the surface, Apple's chips are architecturally 
 
 ~~(An example: The Asahi Linux folks can't use PSCI, the ARM standard for core bringup, for starting the other ARM cores since they plan to run Linux in EL2 and Apple does not implement EL3. Windows requires PSCI, and this combined with other circumstances means I'll need to get PSCI working on the Apple cores.)~~ No longer true, the Asahi folks have confirmed that PSCI support is coming to Asahi in the near future, but the point still stands.
 
+### TL;DR on current status
+
+Working on vGIC distributor/redistributor initialization and handling code
 
 ### When will the project be done?
 
@@ -70,6 +73,15 @@ I'm working on getting m1n1 and it's hypervisor updated to handle booting UEFI a
 - Ethernet
 - Wireless
 - GPU/DCP
+
+### Links
+
+m1n1_windows (the fork I'm using for this project): https://github.com/amarioguy/m1n1_windows
+
+(btw if commits are slow it's because I'm still working and I don't always like to post WIP code as a public commit lol)
+(this can change if people want)
+Project Mu: (coming soon, need to finish vGIC implementation first)
+
 
 ### Credits
 

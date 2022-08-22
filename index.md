@@ -2,6 +2,16 @@
 
 Keeping things simple, the goal is to hopefully run Windows on Apple's M1 and M2 chips (and hopefully future Apple silicon chips too given tweaks to the foundation!).
 
+### Update (8/22/22)
+
+I've been working a lot on the UEFI code as of late, and that repository was private for a while (just made it public as of 8/22/22), and it's been a lot of work as I had to figure out EFI conventions and how the build system worked before debugging many issues I had along the way (it's not even done yet as of 8/22/22 but it was long overdue for the code to go public)
+
+m1n1_windows is still very alive, the vGIC code is going through a very significant refactor but it's still happening soon.
+
+As for published binaries, I'll start publishing them once I get UEFI to the BDS phase of boot (boot device selection). The current plan is to allow my EFI implementation to recognize USB devices and boot from them as a standard PC would but I will fall back to using hard disk partitions for the installer if USB boot turns out to be non viable.
+
+AIC driver work has also started, ANS2 will be started soon enough as well. I'd like to apologize for being sometimes slow, I'm learning a lot as I'm going through this and I want to do this correctly. I'm also not the most communicative, and I don't have enough of a following to justify stuff like a Telegram community or anything like that. I can only offer my assurances that I'm still working on stuff, and I will continue to do my best to ensure a good user experience.
+
 ### Why a whole project for this?
 
 Contrary to how it may appear on the surface, Apple's chips are architecturally very different from standard ARM64 chips from companies like Qualcomm or MediaTek and a lot of hardware enablement needs to be done as a result. Thankfully a lot of work has already been done in this area for Linux through the Asahi Linux project (huge thanks to them for all the hard work they've done and made open source please show them some support!), though plenty of work remains to be done since Windows does some things differently from Linux and there are things the Asahi folks can ignore but I cannot.
@@ -10,7 +20,7 @@ Contrary to how it may appear on the surface, Apple's chips are architecturally 
 
 ### TL;DR on current status
 
-Working on vGIC distributor/redistributor initialization and handling code
+Working on vGIC distributor/redistributor initialization and handling code, and EFI code
 
 ### When will the project be done?
 
@@ -62,7 +72,7 @@ I'm working on getting m1n1 and it's hypervisor updated to handle booting UEFI a
 
 ### Tentative checklist of things still to be done/drivers to be made
 
-- hypervisor/GIC/UEFI bringup (6/12/2022 status: writing vGICv3 distributor code)
+- hypervisor/GIC/UEFI bringup (8/22/2022 update: UEFI SEC phase 90% done, vGIC code being refactored)
 - Windows early boot
 - timers
 - ANS2
@@ -78,9 +88,7 @@ I'm working on getting m1n1 and it's hypervisor updated to handle booting UEFI a
 
 m1n1_windows (the fork I'm using for this project): https://github.com/amarioguy/m1n1_windows
 
-(btw if commits are slow it's because I'm still working and I don't always like to post WIP code as a public commit lol)
-(this can change if people want)
-Project Mu: (coming soon, need to finish vGIC implementation first)
+apple_silicon_projects_mu (the Project Mu implementation for Apple Silicon - very WIP atm): https://github.com/amarioguy/apple_silicon_platforms_mu
 
 
 ### Credits

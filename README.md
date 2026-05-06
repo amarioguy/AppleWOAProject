@@ -1,1 +1,1 @@
-This repository is deprecated, please visit the [AppleWOA](https://github.com/AppleWOA) to see current status.
+This repository is deprecated, please visit the [NTASP](https://github.com/NT-for-ASi) organization to see current status.
